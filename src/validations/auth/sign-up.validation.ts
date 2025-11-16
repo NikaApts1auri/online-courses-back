@@ -8,4 +8,8 @@ exports.signUpSchema = Joi.object({
     .max(20)
     .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
     .required(),
+  acceptTerms: Joi.boolean().valid(true).required().messages({
+    "any.required": "You must accept Terms of Use and Privacy Policy",
+    "any.only": "You must accept Terms of Use and Privacy Policy",
+  }),
 });

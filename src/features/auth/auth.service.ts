@@ -9,8 +9,20 @@ interface AuthRequest extends Request {
   userId?: string;
 }
 
-exports.signUp = async (req: Request, res: Response) => {
-  const { userName, email, password } = req.body;
+interface SignUpBody {
+  userName: string;
+  email: string;
+  password: string;
+  acceptTerms: boolean;
+}
+exports.signUp = async (req: Request<{}, {}, SignUpBody>, res: Response) => {
+  const { userName, email, password, acceptTerms } = req.body;
+
+  if (!acceptTerms) {
+    return res
+      .status(400)
+      .json({ message: "You must accept Terms of Use and Privacy Policy" });
+  }
 
   try {
     const existingUser = await userModel.findOne({ email });
