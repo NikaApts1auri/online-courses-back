@@ -1,12 +1,11 @@
 const userModel = require("../users/user.model");
-const curseModel = require("./curse.model");
+const courseModel = require("./course.model");
 const responseBase = require("../../utils/responseBase");
-const { Request, Response } = require("express"); // CommonJS style
+const { Request, Response } = require("express");
 
-// Get all courses
 async function getAllCourses(req: typeof Request, res: typeof Response) {
   try {
-    const courses = await curseModel.find().populate("author", "-posts");
+    const courses = await courseModel.find().populate("author", "-posts");
     res.json(responseBase.success(courses));
   } catch (error: any) {
     res
@@ -15,10 +14,9 @@ async function getAllCourses(req: typeof Request, res: typeof Response) {
   }
 }
 
-// Get course by ID
 async function getCourseById(req: typeof Request, res: typeof Response) {
   try {
-    const course = await curseModel
+    const course = await courseModel
       .findById(req.params.id)
       .populate("author", "-posts");
     if (!course)
@@ -44,7 +42,7 @@ async function createCourse(req: typeof Request, res: typeof Response) {
       curriculums,
     } = req.body;
 
-    const newCourse = new curseModel({
+    const newCourse = new courseModel({
       title,
       description,
       level,
@@ -82,7 +80,7 @@ async function updateCourse(req: typeof Request, res: typeof Response) {
       curriculums,
     } = req.body;
 
-    const updatedCourse = await curseModel.findByIdAndUpdate(
+    const updatedCourse = await courseModel.findByIdAndUpdate(
       req.params.id,
       { title, description, level, duration, content, author, curriculums },
       { new: true }
@@ -101,10 +99,9 @@ async function updateCourse(req: typeof Request, res: typeof Response) {
   }
 }
 
-// Delete course
 async function deleteCourseById(req: typeof Request, res: typeof Response) {
   try {
-    const deletedCourse = await curseModel.findByIdAndDelete(req.params.id);
+    const deletedCourse = await courseModel.findByIdAndDelete(req.params.id);
     if (!deletedCourse)
       return res.status(404).json(responseBase.fail("Course not found"));
     res.json(

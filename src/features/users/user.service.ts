@@ -13,9 +13,15 @@ exports.getAllUsers = async (req: Request, res: Response) => {
       filter.email = { $regex: `^${queryParams.email}` };
     }
 
+    // strictPopulate: false — იცავს populate შეცდომას, თუ ref არასწორია
     const users = await userModel
       .find(filter)
-      .populate("posts", "title content");
+      .populate({
+        path: "posts",
+        select: "title content",
+        strictPopulate: false,
+      });
+
     res.json(responseBase.success(users));
   } catch (error: any) {
     res
@@ -27,7 +33,7 @@ exports.getAllUsers = async (req: Request, res: Response) => {
 // Create user
 exports.createUser = async (req: Request, res: Response) => {
   try {
-    const { fullName, userName, birthDate, gender, email, password } = req.body;
+    const { userName, email, password } = req.body;
 
     const existUser = await userModel.findOne({ email });
     if (existUser) {
@@ -37,10 +43,8 @@ exports.createUser = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await userModel.create({
-      fullName,
       userName,
-      birthDate,
-      gender,
+
       email,
       password: hashedPassword,
     });

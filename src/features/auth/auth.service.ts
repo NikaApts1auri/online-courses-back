@@ -18,7 +18,12 @@ exports.signUp = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const newUser = await userModel.create({ userName, email, password });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await userModel.create({
+      userName,
+      email: email.toLowerCase().trim(),
+      password: hashedPassword,
+    });
 
     res.status(201).json(newUser);
   } catch (err) {
@@ -30,7 +35,10 @@ exports.signUp = async (req: Request, res: Response) => {
 exports.signIn = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
-  const existUser = await userModel.findOne({ email }).select("password");
+  const existUser = await userModel
+    .findOne({ email: email.toLowerCase().trim() })
+    .select("password");
+
   if (!existUser) {
     return res
       .status(400)
@@ -55,6 +63,7 @@ exports.signIn = async (req: Request, res: Response) => {
 };
 
 exports.currentUser = async (req: AuthRequest, res: Response) => {
-  const user = await userModel.findById(req.userId);
+  const user = await userModel.findById(req.userId).select("-password");
+
   res.json(responseBase.success(user));
 };
