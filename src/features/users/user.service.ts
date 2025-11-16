@@ -14,13 +14,11 @@ exports.getAllUsers = async (req: Request, res: Response) => {
     }
 
     // strictPopulate: false — იცავს populate შეცდომას, თუ ref არასწორია
-    const users = await userModel
-      .find(filter)
-      .populate({
-        path: "posts",
-        select: "title content",
-        strictPopulate: false,
-      });
+    const users = await userModel.find(filter).populate({
+      path: "posts",
+      select: "title content",
+      strictPopulate: false,
+    });
 
     res.json(responseBase.success(users));
   } catch (error: any) {

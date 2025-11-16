@@ -45,13 +45,3 @@
 //     │
 //     └── types/
 //         └── express.d.ts
-
-// const express = require("express");
-// const router = express.Router();
-
-// const userRoutes = require("../features/users/user.model");
-// const authRoutes = require("../features/auth/auth.model");
-
-// router.use("/auth", authRoutes);
-// router.use("/users", userRoutes);
-// module.exports = router;
