@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/users/(.*)", "destination": "/api/index.js" },
+    { "source": "/auth/(.*)", "destination": "/api/index.js" },
+    { "source": "/course/(.*)", "destination": "/api/index.js" },
+    { "source": "/contact/(.*)", "destination": "/api/index.js" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
