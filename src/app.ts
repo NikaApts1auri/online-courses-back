@@ -1,11 +1,12 @@
 const express = require("express");
 const cors = require("cors");
+
 const userRouter = require("./features/users/user.controller");
-const { logger } = require("./middlewares/logger.middleware");
 const authRouter = require("./features/auth/auth.controller");
 const courseRouter = require("./features/course/course.controller");
 const contactRouter = require("./features/contact/contact.controller");
-import type { Request, Response, NextFunction } from "express";
+
+const { logger } = require("./middlewares/logger.middleware");
 
 const app = express();
 
@@ -17,7 +18,7 @@ app.use(logger);
 // CORS
 app.use(
   cors({
-    origin: "*", // ან კონკრეტული frontend URL, მაგალითად "http://localhost:3000"
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
@@ -30,22 +31,16 @@ app.use("/api/course", courseRouter);
 app.use("/api/contact", contactRouter);
 
 // 404 Handler
-app.use((req: Request, res: Response) => {
+app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-app.use(
-  (
-    err: Error & { status?: number },
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    console.error(err.stack);
-    res
-      .status(err.status || 500)
-      .json({ message: err.message || "Internal Server Error" });
-  }
-);
+// Error Handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res
+    .status(err.status || 500)
+    .json({ message: err.message || "Internal Server Error" });
+});
 
 module.exports = app;
