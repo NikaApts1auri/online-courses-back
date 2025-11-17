@@ -9,24 +9,22 @@
 //     console.log(`Server running on http://localhost:${PORT}`);
 //   });
 // });
-import type { Request, Response } from "express";
-
 const app = require("./app");
 const connectToDB = require("./config/db.config");
 
-// Vercel handler
 let isDBConnected = false;
+
 connectToDB()
   .then(() => {
     console.log("Database connected");
     isDBConnected = true;
   })
-  .catch((err: any) => {
+  .catch((err) => {
     console.error("Database connection failed:", err);
   });
 
-// CommonJS export default function for Vercel
-module.exports = (req: Request, res: Response) => {
+// CommonJS export for Vercel
+module.exports = (req, res) => {
   if (!isDBConnected) {
     res.status(503).json({ message: "Database not connected yet" });
     return;
