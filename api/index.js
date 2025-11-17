@@ -1,4 +1,3 @@
-const { VercelRequest, VercelResponse } = require("@vercel/node");
 const app = require("../src/app");
 const connectToDB = require("../src/config/db.config");
 
@@ -7,14 +6,18 @@ let isDBConnected = false;
 connectToDB()
   .then(() => {
     isDBConnected = true;
+    console.log("Database connected");
   })
-  .catch(() => {
+  .catch((err) => {
     isDBConnected = false;
+    console.error("Database connection failed:", err);
   });
 
-module.exports = function (req, res) {
+module.exports = (req, res) => {
   if (!isDBConnected) {
-    return res.status(503).json({ message: "Database not connected yet" });
+    res.status(503).json({ message: "Database not connected yet" });
+    return;
   }
+
   app(req, res);
 };
