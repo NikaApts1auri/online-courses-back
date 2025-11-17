@@ -7,6 +7,7 @@ const authRouter = require("./features/auth/auth.controller");
 const courseRouter = require("./features/course/course.controller");
 const contactRouter = require("./features/contact/contact.controller");
 const { logger } = require("./middlewares/logger.middleware");
+const path = require("path");
 
 const app = express();
 
@@ -23,7 +24,12 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
+// Static + SPA fallback
+app.use(express.static(path.join(__dirname, "public")));
+app.get("*", (req: Request, res: Response, next: NextFunction) => {
+  if (req.path.startsWith("/api")) return next();
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 // Routes
 app.use("/api/users", userRouter);
 app.use("/api/auth", authRouter);
