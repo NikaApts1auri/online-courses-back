@@ -24,10 +24,10 @@ app.use(
 );
 
 // Routes
-app.use("/api/users", userRouter);
-app.use("/api/auth", authRouter);
-app.use("/api/course", courseRouter);
-app.use("/api/contact", contactRouter);
+app.use("/users", userRouter);
+app.use("/auth", authRouter);
+app.use("/course", courseRouter);
+app.use("/contact", contactRouter);
 
 // 404 Handler
 app.use((req: Request, res: Response) => {
