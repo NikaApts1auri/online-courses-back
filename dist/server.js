@@ -5,7 +5,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const app = require("./app");
 const connectToDB = require("./config/db.config");
-// Vercel handler
 let isDBConnected = false;
 connectToDB()
     .then(() => {
@@ -15,7 +14,6 @@ connectToDB()
     .catch((err) => {
     console.error("Database connection failed:", err);
 });
-// CommonJS export default function for Vercel
 module.exports = (req, res) => {
     if (!isDBConnected) {
         res.status(503).json({ message: "Database not connected yet" });
