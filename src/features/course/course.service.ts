@@ -1,9 +1,9 @@
 const userModel = require("../users/user.model");
 const courseModel = require("./course.model");
 const responseBase = require("../../utils/responseBase");
-const { Request, Response } = require("express");
+import type { Request, Response } from "express";
 
-async function getAllCourses(req: typeof Request, res: typeof Response) {
+async function getAllCourses(req: Request, res: Response) {
   try {
     const courses = await courseModel.find().populate("author", "-posts");
     res.json(responseBase.success(courses));
@@ -14,7 +14,7 @@ async function getAllCourses(req: typeof Request, res: typeof Response) {
   }
 }
 
-async function getCourseById(req: typeof Request, res: typeof Response) {
+async function getCourseById(req: Request, res: Response) {
   try {
     const course = await courseModel
       .findById(req.params.id)
@@ -30,10 +30,11 @@ async function getCourseById(req: typeof Request, res: typeof Response) {
 }
 
 // Create course
-async function createCourse(req: typeof Request, res: typeof Response) {
+async function createCourse(req: Request, res: Response) {
   try {
     const {
       title,
+      image,
       description,
       level,
       duration,
@@ -44,6 +45,7 @@ async function createCourse(req: typeof Request, res: typeof Response) {
 
     const newCourse = new courseModel({
       title,
+      image,
       description,
       level,
       duration,
@@ -53,9 +55,6 @@ async function createCourse(req: typeof Request, res: typeof Response) {
     });
 
     await newCourse.save();
-    await userModel.findByIdAndUpdate(author, {
-      $push: { courses: newCourse._id },
-    });
 
     res
       .status(201)
@@ -68,10 +67,11 @@ async function createCourse(req: typeof Request, res: typeof Response) {
 }
 
 // Update course
-async function updateCourse(req: typeof Request, res: typeof Response) {
+async function updateCourse(req: Request, res: Response) {
   try {
     const {
       title,
+      image,
       description,
       level,
       duration,
@@ -99,7 +99,7 @@ async function updateCourse(req: typeof Request, res: typeof Response) {
   }
 }
 
-async function deleteCourseById(req: typeof Request, res: typeof Response) {
+async function deleteCourseById(req: Request, res: Response) {
   try {
     const deletedCourse = await courseModel.findByIdAndDelete(req.params.id);
     if (!deletedCourse)

@@ -6,13 +6,11 @@ const { courseSchema } = require("../../validations/course/courseValidator");
 
 const courseRouter = Router();
 
-console.log(courseService);
-
 courseRouter.get("/", courseService.getAllCourses);
 courseRouter.get("/:id", isAuthMiddleware, courseService.getCourseById);
 courseRouter.post(
   "/",
-  isAuthMiddleware,
+  // isAuthMiddleware,
   validateMiddleware(courseSchema),
   courseService.createCourse
 );

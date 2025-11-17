@@ -1,3 +1,5 @@
+import Joi = require("joi");
+
 const { default: mongoose, Schema } = require("mongoose");
 
 const courseSchema = new mongoose.Schema({
@@ -5,6 +7,11 @@ const courseSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
+  image: {
+    type: String,
+    required: true,
+  },
+
   description: {
     type: String,
     require: true,
@@ -22,9 +29,8 @@ const courseSchema = new mongoose.Schema({
     require: true,
   },
   author: {
-    type: Schema.Types.ObjectId,
-    ref: "user",
-    require: true,
+    type: String,
+    required: true,
   },
   curriculums: [
     {

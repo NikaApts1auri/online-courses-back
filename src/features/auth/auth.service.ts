@@ -11,6 +11,7 @@ interface AuthRequest extends Request {
 
 interface SignUpBody {
   userName: string;
+
   email: string;
   password: string;
   acceptTerms: boolean;
