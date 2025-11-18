@@ -28,6 +28,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^7.0.0",
     "mongoose": "^8.19.4",
-    "rimraf": "^6.1.0"
+    "rimraf": "^6.1.0",
+    "serverless-http": "^4.0.0"
   }
 }

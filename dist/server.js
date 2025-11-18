@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const app = require("./app");
 const connectToDB = require("./config/db.config");
+const serverless = require("serverless-http");
 let isDBConnected = false;
 connectToDB()
     .then(() => {
@@ -11,11 +12,12 @@ connectToDB()
     .catch((err) => {
     console.error("Database connection failed:", err);
 });
+const handler = serverless(app);
 module.exports = (req, res) => {
     if (!isDBConnected) {
         res.status(503).json({ message: "Database not connected yet" });
         return;
     }
-    app(req, res);
+    return handler(req, res);
 };
 //# sourceMappingURL=server.js.map
