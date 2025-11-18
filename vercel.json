@@ -1,14 +1,9 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/index.js",
-      "use": "@vercel/node"
-    }
-  ],
+  "builds": [{ "src": "src/index.js", "use": "@vercel/node" }],
   "routes": [
     { "src": "/course", "dest": "/api/course" },
     { "src": "/users", "dest": "/api/users" },
-    { "src": "/api/(.*)", "dest": "dist/server.js" }
+    { "src": "/api/(.*)", "dest": "/src/index.js" }
   ]
 }
