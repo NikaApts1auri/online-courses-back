@@ -20,7 +20,9 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
+app.get("/", (req, res) => {
+  res.send("API is running");
+});
 // API routes
 app.use("/api/users", userRouter);
 app.use("/api/auth", authRouter);
