@@ -1,7 +1,4 @@
 "use strict";
-// const express = require("express");
-// const connectToDB = require("./config/db.config");
-// const app = require("./app");
 Object.defineProperty(exports, "__esModule", { value: true });
 const app = require("./app");
 const connectToDB = require("./config/db.config");
