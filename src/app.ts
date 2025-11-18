@@ -8,7 +8,7 @@ const contactRouter = require("./features/contact/contact.controller");
 const { logger } = require("./middlewares/logger.middleware");
 
 const app = express();
-
+console.log("Starting application...");
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
