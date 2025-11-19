@@ -3,23 +3,22 @@ const app = require("./app");
 const connectToDB = require("./config/db.config");
 const serverless = require("serverless-http");
 
-let isDBConnected = false;
-
-connectToDB()
-  .then(() => {
-    console.log("Database connected");
-    isDBConnected = true;
-  })
-  .catch((err: any) => {
-    console.error("Database connection failed:", err);
-  });
-
 const handler = serverless(app);
 
-module.exports = (req: Request, res: Response) => {
-  if (!isDBConnected) {
-    res.status(503).json({ message: "Database not connected yet" });
-    return;
+// შეცვალეთ module.exports ამით:
+module.exports = async (req: Request, res: Response) => {
+  // 1. დაამყარეთ კავშირი DB-სთან (თუ უკვე არ არის)
+  try {
+    if (!isDBConnected) {
+      await connectToDB(); // დაელოდეთ კავშირს
+      isDBConnected = true;
+      console.log("Database connected on demand");
+    }
+  } catch (err) {
+    console.error("Database connection failed during request:", err);
+    return res.status(503).json({ message: "Database connection failed" });
   }
+
+  // 2. დაამუშავეთ მოთხოვნა
   return handler(req, res);
 };
