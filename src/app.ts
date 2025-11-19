@@ -24,6 +24,12 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+app.get("/", (req: Request, res: Response) => {
+  res.status(200).json({
+    message: "Server is running!",
+    documentation: "Access API routes via /api/...",
+  });
+});
 app.use(express.static("public"));
 app.use(express.static(path.join(__dirname, "public")));
 // Routes
