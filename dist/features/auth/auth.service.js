@@ -6,56 +6,86 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const responseBase = require("../../utils/responseBase");
 exports.signUp = async (req, res) => {
-    const { userName, email, password, acceptTerms } = req.body;
-    if (!acceptTerms) {
-        return res
-            .status(400)
-            .json({ message: "You must accept Terms of Use and Privacy Policy" });
+  const { userName, email, password, acceptTerms } = req.body;
+  if (!acceptTerms) {
+    return res
+      .status(400)
+      .json({ message: "You must accept Terms of Use and Privacy Policy" });
+  }
+  try {
+    const existingUser = await userModel.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
     }
-    try {
-        const existingUser = await userModel.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ message: "User already exists" });
-        }
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await userModel.create({
-            userName,
-            email: email.toLowerCase().trim(),
-            password: hashedPassword,
-        });
-        res.status(201).json(newUser);
-    }
-    catch (err) {
-        console.error("Signup error:", err);
-        res.status(500).json({ message: "Server error" });
-    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await userModel.create({
+      userName,
+      email: email.toLowerCase().trim(),
+      password: hashedPassword,
+    });
+    res.status(201).json(newUser);
+  } catch (err) {
+    console.error("Signup error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 exports.signIn = async (req, res) => {
-    const { email, password } = req.body;
+  console.log("Incoming login request body:", req.body);
+
+  const { email, password } = req.body;
+
+  try {
     const existUser = await userModel
-        .findOne({ email: email.toLowerCase().trim() })
-        .select("password");
+      .findOne({ email: email.toLowerCase().trim() })
+      .select("password name email");
+
     if (!existUser) {
-        return res
-            .status(400)
-            .json(responseBase.fail("email or password is incorrect"));
+      console.log("User not found for email:", email);
+      return res.status(400).json({
+        success: false,
+        message: "Email or password is incorrect",
+        error: true,
+      });
     }
+
     const isPassEqual = await bcrypt.compare(password, existUser.password);
+    console.log("Password match:", isPassEqual);
+
     if (!isPassEqual) {
-        return res
-            .status(400)
-            .json(responseBase.fail("email or password is incorrect"));
+      return res.status(400).json({
+        success: false,
+        message: "Email or password is incorrect",
+        error: true,
+      });
     }
-    const payload = {
-        userId: existUser._id,
-    };
-    const token = await jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "1h",
+
+    const payload = { userId: existUser._id };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "1h",
     });
-    res.json(responseBase.success(token));
+
+    return res.json({
+      success: true,
+      message: "Success",
+      token,
+      user: {
+        id: existUser._id,
+        name: existUser.name,
+        email: existUser.email,
+      },
+      error: null,
+    });
+  } catch (err) {
+    console.error("Sign-in error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: true,
+    });
+  }
 };
 exports.currentUser = async (req, res) => {
-    const user = await userModel.findById(req.userId).select("-password");
-    res.json(responseBase.success(user));
+  const user = await userModel.findById(req.userId).select("-password");
+  res.json(responseBase.success(user));
 };
 //# sourceMappingURL=auth.service.js.map
