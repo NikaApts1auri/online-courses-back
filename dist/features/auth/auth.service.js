@@ -7,28 +7,61 @@ require("dotenv").config();
 const responseBase = require("../../utils/responseBase");
 exports.signUp = async (req, res) => {
   const { userName, email, password, acceptTerms } = req.body;
+
   if (!acceptTerms) {
-    return res
-      .status(400)
-      .json({ message: "You must accept Terms of Use and Privacy Policy" });
+    return res.status(400).json({
+      success: false,
+      message: "You must accept Terms of Use and Privacy Policy",
+      error: true,
+    });
   }
+
   try {
-    const existingUser = await userModel.findOne({ email });
+    const existingUser = await userModel.findOne({
+      email: email.toLowerCase().trim(),
+    });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({
+        success: false,
+        message: "User already exists",
+        error: true,
+      });
     }
+
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const newUser = await userModel.create({
       userName,
       email: email.toLowerCase().trim(),
       password: hashedPassword,
     });
-    res.status(201).json(newUser);
+
+    const payload = { userId: newUser._id };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      token,
+      user: {
+        id: newUser._id,
+        name: newUser.userName,
+        email: newUser.email,
+      },
+      error: null,
+    });
   } catch (err) {
     console.error("Signup error:", err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: true,
+    });
   }
 };
+
 exports.signIn = async (req, res) => {
   console.log("Incoming login request body:", req.body);
 
