@@ -62,3 +62,40 @@
 //       }
 //     ]
 //   }
+
+// import type { Request, Response } from "express";
+// const app = require("./app");
+// const connectToDB = require("./config/db.config");
+// const serverless = require("serverless-http");
+
+// let cachedDBConnection: null = null;
+
+// const handler = serverless(app);
+
+// module.exports = async (req: Request, res: Response) => {
+//   if (cachedDBConnection === null) {
+//     try {
+//       // 2. ახალი კავშირის დამყარება (მხოლოდ Cold Start-ის დროს)
+//       console.log("Establishing new DB connection...");
+//       cachedDBConnection = await connectToDB(); // ვიყენებთ await-ს!
+
+//       // ეს სტრიქონები (გარდა cachedDBConnection-ისა) არ არის საჭირო, რადგან კავშირი უკვე დამყარდა
+//       // isDBConnected = true;
+
+//       console.log("Database connected and cached.");
+//     } catch (err) {
+//       console.error("Database connection failed during request:", err);
+//       // თუ კავშირი ვერ შედგა, დააბრუნეთ 503 სტატუსი
+//       cachedDBConnection = null;
+//       return res
+//         .status(503)
+//         .json({ message: "Database connection failed, check IP Whitelist." });
+//     }
+//   } else {
+//     console.log("Using cached DB connection.");
+//   }
+
+//   return handler(req, res);
+// };
+
+// server.ts

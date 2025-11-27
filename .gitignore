@@ -4,3 +4,5 @@
 *.log
 .DS_Store
 .structure.ts
+/structure.ts
+structure.ts
