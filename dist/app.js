@@ -19,6 +19,13 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
 }));
+app.get("/", (req, res) => {
+    res.status(200).json({
+        message: "Server is running!",
+        documentation: "Access API routes via /api/...",
+    });
+});
+app.use(express.static("public"));
 app.use(express.static(path.join(__dirname, "public")));
 // Routes
 app.use("/api/users", userRouter);
