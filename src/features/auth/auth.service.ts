@@ -52,26 +52,31 @@ exports.signIn = async (req: Request, res: Response) => {
     .select("password");
 
   if (!existUser) {
-    return res
-      .status(400)
-      .json(responseBase.fail("email or password is incorrect"));
+    return res.status(400).json({
+      success: false,
+      message: "Email or password is incorrect",
+      error: true,
+    });
   }
 
   const isPassEqual = await bcrypt.compare(password, existUser.password);
   if (!isPassEqual) {
-    return res
-      .status(400)
-      .json(responseBase.fail("email or password is incorrect"));
+    return res.status(400).json({
+      success: false,
+      message: "Email or password is incorrect",
+      error: true,
+    });
   }
 
-  const payload = {
-    userId: existUser._id,
-  };
+  const payload = { userId: existUser._id };
+  const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-  const token = await jwt.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: "1h",
+  return res.json({
+    success: true,
+    message: "Success",
+    token,
+    error: null,
   });
-  res.json(responseBase.success(token));
 };
 
 exports.currentUser = async (req: AuthRequest, res: Response) => {
