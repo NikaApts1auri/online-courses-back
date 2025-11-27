@@ -45,6 +45,7 @@ exports.signUp = async (req: Request<{}, {}, SignUpBody>, res: Response) => {
 };
 
 exports.signIn = async (req: Request, res: Response) => {
+  console.log("Incoming login request body:", req.body); // <-- აქ დაამატე
   const { email, password } = req.body;
 
   const existUser = await userModel
