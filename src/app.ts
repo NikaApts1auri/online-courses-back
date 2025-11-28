@@ -17,7 +17,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(logger);
 
 // CORS
-app.use(
+
+app.options(
+  "*",
   cors({
     origin: [
       "http://localhost:3001",
