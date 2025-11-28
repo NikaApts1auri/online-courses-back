@@ -52,7 +52,7 @@ exports.signIn = async (req: Request, res: Response) => {
   try {
     const existUser = await userModel
       .findOne({ email: email.toLowerCase().trim() })
-      .select("+password name email"); // ← FIX
+      .select("+password email userName");
 
     console.log("existUser:", existUser);
     console.log("existUser.password:", existUser?.password);
@@ -87,7 +87,7 @@ exports.signIn = async (req: Request, res: Response) => {
       token,
       user: {
         id: existUser._id,
-        name: existUser.name,
+        name: existUser.userName,
         email: existUser.email,
       },
       error: null,
