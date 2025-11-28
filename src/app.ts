@@ -19,11 +19,16 @@ app.use(logger);
 // CORS
 app.use(
   cors({
-    origin: "*",
+    origin: [
+      "http://localhost:3001",
+      "https://online-courses-front.vercel.app",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
+
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({
     message: "Server is running!",
