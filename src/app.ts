@@ -19,8 +19,8 @@ app.use(logger);
 app.use(
   cors({
     origin: [
-      "http://localhost:3000", // frontend dev
       "https://online-courses-front.vercel.app", // production frontend
+      "http://localhost:3000", // frontend dev
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
