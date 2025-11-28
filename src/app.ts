@@ -15,12 +15,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(logger);
 
-// CORS - **Middleware should be before routes**
 app.use(
   cors({
     origin: [
-      "https://online-courses-front.vercel.app", // production frontend
-      "http://localhost:3000", // frontend dev
+      "https://online-courses-front.vercel.app",
+      "http://localhost:3000",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
