@@ -46,38 +46,65 @@ exports.signUp = async (req: Request<{}, {}, SignUpBody>, res: Response) => {
 
 exports.signIn = async (req: Request, res: Response) => {
   console.log("Incoming login request body:", req.body);
+
   const { email, password } = req.body;
 
-  const existUser = await userModel
-    .findOne({ email: email.toLowerCase().trim() })
-    .select("password");
+  // Body check
+  console.log("email:", email);
+  console.log("password:", password);
 
-  if (!existUser) {
-    return res.status(400).json({
+  try {
+    // SELECT +password — აქაა მთავარი ფიქსი
+    const existUser = await userModel
+      .findOne({ email: email.toLowerCase().trim() })
+      .select("+password name email");
+
+    console.log("existUser:", existUser);
+    console.log("existUser.password:", existUser?.password);
+
+    if (!existUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Email or password is incorrect",
+        error: true,
+      });
+    }
+
+    const isPassEqual = await bcrypt.compare(password, existUser.password);
+    console.log("Password comparison result:", isPassEqual);
+
+    if (!isPassEqual) {
+      return res.status(400).json({
+        success: false,
+        message: "Email or password is incorrect",
+        error: true,
+      });
+    }
+
+    const payload = { userId: existUser._id };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    return res.json({
+      success: true,
+      message: "Success",
+      token,
+      user: {
+        id: existUser._id,
+        name: existUser.name,
+        email: existUser.email,
+      },
+      error: null,
+    });
+  } catch (err) {
+    console.error("Sign-in error:", err);
+    return res.status(500).json({
       success: false,
-      message: "Email or password is incorrect",
+      message: "Server error",
       error: true,
     });
   }
-
-  const isPassEqual = await bcrypt.compare(password, existUser.password);
-  if (!isPassEqual) {
-    return res.status(400).json({
-      success: false,
-      message: "Email or password is incorrect",
-      error: true,
-    });
-  }
-
-  const payload = { userId: existUser._id };
-  const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
-
-  return res.json({
-    success: true,
-    message: "Success",
-    token,
-    error: null,
-  });
 };
 
 exports.currentUser = async (req: AuthRequest, res: Response) => {
