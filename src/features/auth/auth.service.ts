@@ -1,109 +1,87 @@
-const userModel = require("../users/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-import type { Request, Response } from "express";
-require("dotenv").config();
+const User = require("./user.model");
 const responseBase = require("../../utils/responseBase");
+import type { Request, Response } from "express";
 
-interface AuthRequest extends Request {
-  userId?: string;
-}
-
-interface SignUpBody {
-  userName: string;
-  email: string;
-  password: string;
-  acceptTerms: boolean;
-}
-exports.signUp = async (req: Request<{}, {}, SignUpBody>, res: Response) => {
+exports.signUp = async (req: Request, res: Response) => {
   const { userName, email, password, acceptTerms } = req.body;
 
   if (!acceptTerms) {
     return res
       .status(400)
-      .json({ message: "You must accept Terms of Use and Privacy Policy" });
+      .json(
+        responseBase.fail("You must accept Terms of Use and Privacy Policy")
+      );
   }
 
   try {
-    const existingUser = await userModel.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+    const existUser = await User.findOne({ email: email.toLowerCase().trim() });
+    if (existUser) {
+      return res.status(400).json(responseBase.fail("User already exists"));
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await userModel.create({
+    const newUser = await User.create({
       userName,
       email: email.toLowerCase().trim(),
       password: hashedPassword,
     });
 
-    res.status(201).json(newUser);
+    return res.status(201).json(
+      responseBase.success(
+        {
+          id: newUser._id,
+          name: newUser.userName,
+          email: newUser.email,
+        },
+        "User created successfully"
+      )
+    );
   } catch (err) {
-    console.error("Signup error:", err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json(responseBase.fail("Server error", err));
   }
 };
 
 exports.signIn = async (req: Request, res: Response) => {
-  console.log("Incoming login request body:", req.body);
-
   const { email, password } = req.body;
 
   try {
-    const existUser = await userModel
-      .findOne({ email: email.toLowerCase().trim() })
-      .select("+password email userName");
-
-    console.log("existUser:", existUser);
-    console.log("existUser.password:", existUser?.password);
+    const existUser = await User.findOne({
+      email: email.toLowerCase().trim(),
+    }).select("+password userName email");
 
     if (!existUser) {
-      return res.status(400).json({
-        success: false,
-        message: "Email or password is incorrect",
-        error: true,
-      });
+      return res
+        .status(400)
+        .json(responseBase.fail("Email or password is incorrect"));
     }
 
     const isPassEqual = await bcrypt.compare(password, existUser.password);
-    console.log("Password comparison result:", isPassEqual);
-
     if (!isPassEqual) {
-      return res.status(400).json({
-        success: false,
-        message: "Email or password is incorrect",
-        error: true,
-      });
+      return res
+        .status(400)
+        .json(responseBase.fail("Email or password is incorrect"));
     }
 
-    const payload = { userId: existUser._id };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: existUser._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
 
-    return res.json({
-      success: true,
-      message: "Success",
-      token,
-      user: {
-        id: existUser._id,
-        name: existUser.userName,
-        email: existUser.email,
-      },
-      error: null,
-    });
+    return res.json(
+      responseBase.success(
+        {
+          token,
+          user: {
+            id: existUser._id,
+            name: existUser.userName,
+            email: existUser.email,
+          },
+        },
+        "Login successful"
+      )
+    );
   } catch (err) {
-    console.error("Sign-in error:", err);
-    return res.status(500).json({
-      success: false,
-      message: "Server error",
-      error: true,
-    });
+    return res.status(500).json(responseBase.fail("Server error", err));
   }
-};
-
-exports.currentUser = async (req: AuthRequest, res: Response) => {
-  const user = await userModel.findById(req.userId).select("-password");
-
-  res.json(responseBase.success(user));
 };
