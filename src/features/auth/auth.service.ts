@@ -49,15 +49,10 @@ exports.signIn = async (req: Request, res: Response) => {
 
   const { email, password } = req.body;
 
-  // Body check
-  console.log("email:", email);
-  console.log("password:", password);
-
   try {
-    // SELECT +password — აქაა მთავარი ფიქსი
     const existUser = await userModel
       .findOne({ email: email.toLowerCase().trim() })
-      .select("+password name email");
+      .select("+password name email"); // ← FIX
 
     console.log("existUser:", existUser);
     console.log("existUser.password:", existUser?.password);
