@@ -34,7 +34,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // Routes
 app.use("/api/users", userRouter);
 app.use("/api/auth", authRouter);
-app.use("/api/course", courseRouter);
+app.use("/api/courses", courseRouter);
 app.use("/api/contact", contactRouter);
 
 // Root route
